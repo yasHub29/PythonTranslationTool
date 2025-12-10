@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>ドキュメント翻訳ツール</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>ドキュメント翻訳ツール</h1>
+        <p class="subtitle">PPT、EXCEL、WORDファイルをアップロードし、英語・日本語・ベトナム語の翻訳を行います。</p>
+
+        <form action="/translate" method="post" enctype="multipart/form-data" id="translate_form">
+
+            <!-- === ドラッグ＆ドロップ === -->
+            <label>📄 翻訳するファイル：</label>
+            <div id="drop_zone" class="drop-zone">
+                <p>ファイルをドロップするか、選択してください</p>
+                <input type="file" name="file" id="file" required>
+            </div>
+
+            <!-- 翻訳元 -->
+            <label for="translate_from">翻訳元の言語：</label>
+            <select name="translate_from" id="translate_from" required>
+                <option value="">言語を選択してください</option>
+                <option value="en">英語</option>
+                <option value="ja">日本語</option>
+                <option value="vi">ベトナム語</option>
+            </select>
+
+            <!-- 翻訳先 -->
+            <label for="translate_to">翻訳先の言語：</label>
+            <select name="translate_to" id="translate_to" required>
+                <option value="">言語を選択してください</option>
+                <option value="en">英語</option>
+                <option value="ja">日本語</option>
+                <option value="vi">ベトナム語</option>
+            </select>
+
+            <button type="submit" id="translate_button">翻訳を開始</button>
+
+            <div id="loading_area" class="loading-area hidden">
+                <div class="spinner"></div>
+                <p>翻訳中です。しばらくお待ちください...</p>
+            </div>
+
+        </form>
+
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="flash">
+                {% for msg in messages %}
+                    <p>⚠️ {{ msg }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+    </div>
+
+    <footer>
+        <p>© 2025 エルエスアイ開発研究所</p>
+    </footer>
+
+<script>
+/* === Drag & Drop File Upload === */
+const dropZone = document.getElementById("drop_zone");
+const fileInput = document.getElementById("file");
+
+dropZone.addEventListener("click", () => fileInput.click());
+
+fileInput.addEventListener("change", () => {
+    if (fileInput.files.length > 0) {
+        dropZone.querySelector("p").textContent = fileInput.files[0].name;
+    }
+});
+
+dropZone.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    dropZone.classList.add("dragover");
+});
+
+dropZone.addEventListener("dragleave", () => {
+    dropZone.classList.remove("dragover");
+});
+
+dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.classList.remove("dragover");
+
+    if (e.dataTransfer.files.length > 0) {
+        fileInput.files = e.dataTransfer.files;
+        dropZone.querySelector("p").textContent = e.dataTransfer.files[0].name;
+    }
+});
+
+
+/* === 翻訳元と翻訳先の排他 === */
+document.getElementById("translate_from").addEventListener("change", function () {
+    const from = this.value;
+    const toSelect = document.getElementById("translate_to");
+    const options = toSelect.querySelectorAll("option");
+
+    options.forEach(opt => {
+        opt.disabled = false;
+        if (opt.value === from) {
+            opt.disabled = true;
+        }
+    });
+
+    if (toSelect.value === from) {
+        toSelect.value = "";
+    }
+});
+
+
+/* === 読み込みアニメーション === */
+document.getElementById("translate_form").addEventListener("submit", function () {
+    const btn = document.getElementById("translate_button");
+    const loading = document.getElementById("loading_area");
+
+    btn.disabled = true;
+    btn.classList.add("disabled");
+    loading.classList.remove("hidden");
+});
+</script>
+
+</body>
+</html>

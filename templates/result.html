@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>翻訳完了</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>✅ 翻訳が完了しました</h1>
+        <p class="subtitle">翻訳済みのファイルを以下からダウンロードできます。</p>
+
+        <div class="actions">
+            {% if output_path %}
+            <a class="btn" href="{{ url_for('download_file', filename=output_path) }}">📥 ダウンロード</a>
+            {% endif %}
+            <a class="btn secondary" href="{{ url_for('index') }}">🔁 別のファイルを翻訳</a>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 エルエスアイ開発研究所</p>
+    </footer>
+</body>
+</html>
